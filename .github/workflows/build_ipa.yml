@@ -1,0 +1,54 @@
+name: Build IPA for EeveeSpotifyReborn
+
+# This workflow builds an unsigned .ipa for the EeveeSpotifyReborn tweak using a
+# macOS runner.  It uses Theos to compile the project and then packages it
+# as an IPA.  You can trigger this workflow manually via the Actions tab or
+# automatically on pushes to the `swift` branch.
+
+on:
+  # Allow the workflow to be run manually from the GitHub\u00a0UI
+  workflow_dispatch:
+
+  # Uncomment the following lines if you want the IPA to be built on every push
+  # push:
+  #   branches: [ swift ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      # Install Theos and its dependencies.  Theos is used to build iOS
+      # jailbreak tweaks and supports packaging as .ipa.  We clone the
+      # repository to a temporary directory and export the THEOS environment
+      # variable for subsequent commands.
+      - name: Install Theos
+        run: |
+          brew install ldid dpkg
+          git clone --recursive https://github.com/theos/theos.git "$RUNNER_TEMP/theos"
+          echo "THEOS=$RUNNER_TEMP/theos" >> $GITHUB_ENV
+
+      # Build the tweak and package it as an IPA.  Setting
+      # THEOS_PACKAGE_FORMAT to `ipa` instructs Theos to produce an .ipa
+      # instead of the default .deb.  The resulting IPA will be placed in
+      # the packages/ directory.
+      - name: Build IPA
+        env:
+          THEOS: ${{ env.THEOS }}
+        run: |
+          cd EeveeSpotifyReborn-swift
+          make clean
+          make package THEOS_PACKAGE_FORMAT=ipa
+
+      # Upload the generated IPA as a workflow artifact.  After the workflow
+      # completes you can download the IPA from the Actions run summary.
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: EeveeSpotifyReborn-ipa
+          path: |
+            EeveeSpotifyReborn-swift/packages/*.ipa
