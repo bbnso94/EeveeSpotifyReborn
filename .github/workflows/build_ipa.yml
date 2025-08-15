@@ -6,7 +6,7 @@ name: Build IPA for EeveeSpotifyReborn
 # automatically on pushes to the `swift` branch.
 
 on:
-  # Allow the workflow to be run manually from the GitHub\u00a0UI
+  # Allow the workflow to be run manually from the GitHub UI
   workflow_dispatch:
 
   # Uncomment the following lines if you want the IPA to be built on every push
@@ -47,7 +47,7 @@ jobs:
       # Upload the generated IPA as a workflow artifact.  After the workflow
       # completes you can download the IPA from the Actions run summary.
       - name: Upload IPA artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: EeveeSpotifyReborn-ipa
           path: |
