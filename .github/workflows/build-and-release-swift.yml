@@ -161,7 +161,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        last_update_repo_date=$(git log -1 --grep="update: repo" --format=%cI)
+        last_update_repo_date=$(git log --grep="bump" --format=%cI | sed -n 2p)
         CHANGELOG=""
 
         gh pr list --state merged --search "merged:>${last_update_repo_date}" --json files,author \
@@ -216,9 +216,3 @@ jobs:
         EEVEESPOTIFY_CHANNEL_ID: ${{ secrets.EEVEESPOTIFY_CHANNEL_ID }}
         EEVEESPOTIFY_CHANNEL_ACCESS_HASH: ${{ secrets.EEVEESPOTIFY_CHANNEL_ACCESS_HASH }}
       run: ./Tools/TelegramUploadEeveeSpotify
-
-  update-repo:
-      needs: release
-      permissions:
-        contents: write
-      uses: ./.github/workflows/update-repo.yml
